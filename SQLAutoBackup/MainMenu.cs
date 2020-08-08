@@ -464,7 +464,7 @@ namespace SQLAutoBackup
                         
                     };
 
-                node.Text = backup.BackupName + Environment.NewLine + "Test";
+                node.Text = backup.BackupName + Environment.NewLine + "";
 
                 if (!MyTreeView.Nodes.Contains(node))
                     MyTreeView.Nodes.Add(node);

@@ -479,23 +479,19 @@ namespace SQLAutoBackup
             {
                 Font nodeFont;
                 if (e.Node.NodeFont != null)
-                    nodeFont = new Font(e.Node.NodeFont.FontFamily, e.Node.NodeFont.Size + 2, FontStyle.Bold);
+                    nodeFont = e.Node.NodeFont;//new Font(e.Node.NodeFont.FontFamily, e.Node.NodeFont.Size + 2, FontStyle.Bold);
                 else
                 {
-                    var sfont = ((TreeView)sender).Font;
-                    nodeFont = new Font(sfont.FontFamily, sfont.Size + 2, FontStyle.Bold);
+                    nodeFont = ((TreeView)sender).Font;
+                    //var sfont = ((TreeView)sender).Font;
+                    //  nodeFont = new Font(sfont.FontFamily, sfont.Size, FontStyle.Bold);
                 }
-                Brush brush/*;
-                if (this.ActiveControl != e.Node.TreeView)
-                    brush = Brushes.Red;
-                else
-                    brush*/ = Brushes.Transparent;
 
-                e.Graphics.FillRectangle(brush, Rectangle.Inflate(e.Bounds, 0, 0));//Transparent
+                e.Graphics.FillRectangle(Brushes.Transparent, e.Node.Bounds);
 
-                e.Graphics.DrawString(e.Node.Text, nodeFont, Brushes.White, e.Node.Bounds);
+                e.Graphics.DrawString(e.Node.Text, nodeFont, Brushes.White, e.Node.Bounds);//Rectangle.Inflate(e.Node.Bounds, 2, 0)
 
-            
+
             }
             else// Use the default background and node text.
             {

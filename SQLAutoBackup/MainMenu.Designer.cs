@@ -113,6 +113,7 @@
             this.MyTreeView.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(246)))), ((int)(((byte)(246)))));
             this.MyTreeView.Dock = System.Windows.Forms.DockStyle.Left;
             this.MyTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
+            this.MyTreeView.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MyTreeView.FullRowSelect = true;
             this.MyTreeView.HideSelection = false;
             this.MyTreeView.ImageIndex = 0;

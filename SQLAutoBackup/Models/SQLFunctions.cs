@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Sql;
 using System.Data.SqlClient;
+using System.IO;
 using System.Windows.Forms;
 
 namespace SQLAutoBackup
@@ -29,7 +30,7 @@ namespace SQLAutoBackup
             bool ISecurity = IS || (User.Length == 0 || Pass.Length == 0);//If user or password is empty return true (Windows Auth)
             var builder = new SqlConnectionStringBuilder()
             {
-                ConnectTimeout = 30,
+                ConnectTimeout = 10,
                 DataSource = DS,
                 InitialCatalog = DB,
                 IntegratedSecurity = ISecurity,
@@ -165,6 +166,56 @@ namespace SQLAutoBackup
                 return null;
             }
             return con;
+        }
+
+        /// <summary>
+        /// Get SQL ConnectionString
+        /// </summary>
+        /// <param name="DS">DataSource</param>
+        /// <param name="DB">Database</param>
+        /// <param name="IS">IntegratedSecurity</param>
+        /// <param name="User">UserID</param>
+        /// <param name="Pass">Password</param>
+        /// <returns>SQL ConnectionString</returns>
+        public static string GetConnectionString(string DS, string DB, bool IS, string User, string Pass)
+        {
+            if (DB.Length == 0)
+                DB = "master";
+
+            bool ISecurity = IS || (User.Length == 0 || Pass.Length == 0);//If user or password is empty return true (Windows Auth)
+            var builder = new SqlConnectionStringBuilder()
+            {
+                ConnectTimeout = 10,
+                DataSource = DS,
+                InitialCatalog = DB,
+                IntegratedSecurity = ISecurity,
+                UserID = IS ? string.Empty : User,
+                Password = IS ? string.Empty : Pass,
+            };
+
+            return builder.ConnectionString;
+        }
+
+        public static Exception BackupNow(string path, string connectionString)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    using (SqlCommand CmResources = new SqlCommand("USE master BACKUP DATABASE @DBName TO DISK = @ToPath", conn))
+                    {
+                        CmResources.Parameters.Add("@DBName", SqlDbType.NVarChar).Value = conn.Database.ToString();
+                        CmResources.Parameters.Add("@ToPath", SqlDbType.NVarChar).Value = path;
+                        CmResources.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex) when (ex is Exception || ex is SqlException || ex is InvalidCastException || ex is IOException || ex is InvalidOperationException || ex is ObjectDisposedException)
+            {
+                return ex;
+            }
+            return null;
         }
     }
 }

@@ -95,6 +95,8 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.SaveBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.CloseBackup = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.DeleteBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.MyMenuStrip.SuspendLayout();
             this.MyNotifyIconContext.SuspendLayout();
             this.MyParentPanel.SuspendLayout();
@@ -118,8 +120,8 @@
             this.MyTreeView.HideSelection = false;
             this.MyTreeView.ImageIndex = 0;
             this.MyTreeView.ImageList = this.imageList1;
-            this.MyTreeView.Indent = 400;
-            this.MyTreeView.ItemHeight = 50;
+            this.MyTreeView.Indent = 100;
+            this.MyTreeView.ItemHeight = 55;
             this.MyTreeView.Location = new System.Drawing.Point(0, 94);
             this.MyTreeView.Name = "MyTreeView";
             this.MyTreeView.SelectedImageIndex = 0;
@@ -809,7 +811,9 @@
             this.CloneBackup,
             this.toolStripSeparator2,
             this.SaveBackup,
-            this.CloseBackup});
+            this.CloseBackup,
+            this.toolStripSeparator4,
+            this.DeleteBackup});
             this.MyToolStrip.Location = new System.Drawing.Point(0, 24);
             this.MyToolStrip.Name = "MyToolStrip";
             this.MyToolStrip.Size = new System.Drawing.Size(784, 70);
@@ -859,7 +863,7 @@
             // SaveBackup
             // 
             this.SaveBackup.AutoSize = false;
-            this.SaveBackup.Image = global::SQLAutoBackup.Properties.Resources.SQLSave_48;
+            this.SaveBackup.Image = global::SQLAutoBackup.Properties.Resources.SQLSave_48_2;
             this.SaveBackup.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this.SaveBackup.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.SaveBackup.Name = "SaveBackup";
@@ -875,7 +879,7 @@
             // 
             this.CloseBackup.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.CloseBackup.AutoSize = false;
-            this.CloseBackup.Image = ((System.Drawing.Image)(resources.GetObject("CloseBackup.Image")));
+            this.CloseBackup.Image = global::SQLAutoBackup.Properties.Resources.CloseIcon_481;
             this.CloseBackup.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
             this.CloseBackup.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.CloseBackup.Name = "CloseBackup";
@@ -886,6 +890,26 @@
             this.CloseBackup.Visible = false;
             this.CloseBackup.Click += new System.EventHandler(this.CloseBackup_Click);
             this.CloseBackup.VisibleChanged += new System.EventHandler(this.CloseBackup_VisibleChanged);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 70);
+            // 
+            // DeleteBackup
+            // 
+            this.DeleteBackup.AutoSize = false;
+            this.DeleteBackup.Image = ((System.Drawing.Image)(resources.GetObject("DeleteBackup.Image")));
+            this.DeleteBackup.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.DeleteBackup.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.DeleteBackup.Name = "DeleteBackup";
+            this.DeleteBackup.Size = new System.Drawing.Size(80, 67);
+            this.DeleteBackup.Text = "Delete";
+            this.DeleteBackup.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.DeleteBackup.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.DeleteBackup.Visible = false;
+            this.DeleteBackup.Click += new System.EventHandler(this.DeleteBackup_Click);
+            this.DeleteBackup.VisibleChanged += new System.EventHandler(this.DeleteBackup_VisibleChanged);
             // 
             // MainMenu
             // 
@@ -993,6 +1017,8 @@
         public System.Windows.Forms.TreeView MyTreeView;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ImageList imageList1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem DeleteBackup;
     }
 }
 

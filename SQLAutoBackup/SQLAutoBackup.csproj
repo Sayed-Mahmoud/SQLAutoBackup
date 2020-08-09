@@ -65,6 +65,7 @@
     <Compile Include="Models\IniFile.cs" />
     <Compile Include="Models\MyBackup.cs" />
     <Compile Include="Models\SQLFunctions.cs" />
+    <Compile Include="Models\Vars.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -101,6 +102,10 @@
     <None Include="Resources\SQLSave_48.png" />
     <None Include="Resources\Close_48.png" />
     <None Include="Resources\Database_48.png" />
+    <None Include="Resources\SQLSave_48_2.png" />
+    <None Include="Resources\SQLDelete_48.png" />
+    <None Include="Resources\CloseIcon_48.png" />
+    <None Include="Resources\CloseIcon_481.png" />
     <Content Include="SqlBackup.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

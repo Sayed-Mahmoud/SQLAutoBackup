@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SQLAutoBackup.Models;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -18,13 +19,11 @@ namespace SQLAutoBackup
         /// <param name="_FileName"></param>
         public IniFile(string _FileName)
         {
-            /*
-            if (File.Exists(_FileName))
+            if (File.Exists(_FileName) && (_FileName.Contains("//") || _FileName.Contains("\\")))
             {
                 FileName = _FileName;
             }
             else
-            */
             {
                 FileName = Application.StartupPath + "\\" + _FileName;
             }
@@ -109,20 +108,12 @@ namespace SQLAutoBackup
             {
                 Value = string.Empty;
             }
-            /*
-if (Value.GetType() == typeof(bool))
-   if ((bool)Value)
-   {
-       Value = 1;
-   }
-   else
-       Value = 0;
-*/
+
             Write(Section, Key, Value.ToString());
         }
         public void Write(string Section, string Key, string Value)
         {
-            NativeMethods.WritePrivateProfileString(Section, Key, Value, FileName);//WritePrivateProfileStringA
+            NativeMethods.WritePrivateProfileString(Section, Key, Value, FileName);
         }
 
         public void DeleteSection(string Section = null)
@@ -139,55 +130,5 @@ if (Value.GetType() == typeof(bool))
         {
             return ReadString(Section, Key).Length > 0;
         }
-    }
-
-    [SuppressUnmanagedCodeSecurityAttribute]
-    internal static class NativeMethods
-    {
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool SetForegroundWindow(IntPtr hWnd);
-
-
-
-        [DllImport("user32.dll")]
-        internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-
-        [DllImport("kernel32")]
-        internal static extern long WritePrivateProfileString(string section,
-            string key, string val, string filePath);
-        [DllImport("kernel32")]
-        internal static extern int GetPrivateProfileString(string section,
-                 string key, string def, StringBuilder retVal,
-            int size, string filePath);
-        /*
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true, ExactSpelling = true)]
-        internal static extern int GetPrivateProfileStringA(string Section, string Key, string _Default, StringBuilder Buffer, int BufferSize, string FileName);
-        
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true, ExactSpelling = true)]
-        internal static extern int WritePrivateProfileStringA(string Section, string Key, string Arg, string FileName);
-        */
-
-        /*
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true, ExactSpelling = true)]
-        internal static extern int GetPrivateProfileString(string Section, string Key, string _Default, StringBuilder Buffer, int BufferSize, string FileName);
-        */
-
-        /*
-        [DllImport("kernel32", CharSet = CharSet.Unicode)]
-        internal static extern long WritePrivateProfileString(string Section, string Key, string Value, string FilePath);//long
-        
-
-        [DllImport("KERNEL32.DLL", EntryPoint = "WritePrivateProfileStringW",
-           SetLastError = true,
-           CharSet = CharSet.Unicode, ExactSpelling = true,
-           CallingConvention = CallingConvention.StdCall)]
-        internal static extern int WritePrivateProfileString(
-            string lpAppName,
-            string lpKeyName,
-            string lpString,
-            string lpFilename);
-        */
     }
 }

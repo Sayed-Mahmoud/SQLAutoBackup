@@ -1,10 +1,12 @@
 ﻿using SQLAutoBackup.Models;
 using System;
 using System.ComponentModel;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using static SQLAutoBackup.Models.MyBackup;
 
 namespace SQLAutoBackup
 {
@@ -13,9 +15,17 @@ namespace SQLAutoBackup
         private readonly BackgroundWorker HostWorker = new BackgroundWorker();
         private bool CloseApp;
         public bool AutoStartup;
+        public System.Timers.Timer MyBackupTimer;
         public MainMenu()
         {
             InitializeComponent();
+            MyBackupTimer = new System.Timers.Timer(500)
+            {
+                AutoReset = true,
+                Interval = 1000,
+                Enabled = true,
+            };
+            this.MyBackupTimer.Elapsed += MyBackupTimer_Elapsed;
         }
 
         private void SQLAutoBackup_Load(object sender, EventArgs e)
@@ -32,6 +42,25 @@ namespace SQLAutoBackup
 
             //MyTreeView.Nodes.Clear();
             //RefreshMyTreeView();
+        }
+
+        public void BackupsLoaded()
+        {
+            if (this.MyTreeView.InvokeRequired)
+            {
+                this.MyTreeView.BeginInvoke((MethodInvoker)delegate ()
+                {
+                    this.MyTreeView.Nodes.Clear();
+                    //this.RefreshMyTreeView();
+                    this.MyBackupTimer.Start();
+                });
+            }
+            else
+            {
+                this.MyTreeView.Nodes.Clear();
+                //this.RefreshMyTreeView();
+                this.MyBackupTimer.Start();
+            }
         }
 
         private void SQLAutoBackup_FormClosing(object sender, FormClosingEventArgs e)
@@ -75,6 +104,7 @@ namespace SQLAutoBackup
         }
         #endregion
 
+
         #region MyToolStrip
 
         private void CloneBackup_VisibleChanged(object sender, EventArgs e)
@@ -90,6 +120,11 @@ namespace SQLAutoBackup
         private void SaveBackup_VisibleChanged(object sender, EventArgs e)
         {
             toolStripSeparator2.Visible = SaveBackup.Visible;
+        }
+
+        private void DeleteBackup_VisibleChanged(object sender, EventArgs e)
+        {
+            toolStripSeparator4.Visible = DeleteBackup.Visible;
         }
 
         private void NewBackup_Click(object sender, EventArgs e)
@@ -164,7 +199,7 @@ namespace SQLAutoBackup
             }
             #endregion
 
-            MyBackup backup = (MyBackup)MyParentPanel.Tag;
+            var backup = (MyBackup)MyParentPanel.Tag;
 
             //Backup Options
             backup.IsEnabled = IsEnabledBox.Checked;
@@ -207,8 +242,11 @@ namespace SQLAutoBackup
                 backup.SpecificType = MyBackup.SpecificTypes.Months;
             //Years
 
-            MyBackup.Save(backup);
-            RefreshMyTreeView();
+            if (index == 0 || backup.LastBackup < 1)
+                backup.LastBackup = DateTime.Now.Ticks;
+
+            MyBackup.SaveBackup(backup);
+            RefreshMyTreeView(backup);
             MessageBox.Show("Backup settings have been saved successfully.", "Backup settings", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -220,7 +258,24 @@ namespace SQLAutoBackup
             CloneBackup.Visible = false;
         }
 
+        private void DeleteBackup_Click(object sender, EventArgs e)
+        {
+            var backup = (MyBackup)MyParentPanel.Tag;
+            if (backup.MyIndex > 0)
+            {
+                if (MessageBox.Show("Are you sure? You want to delete the backup permanently?", "Delete Backup", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+                    return;
+
+                MyTreeView.Nodes.RemoveByKey(backup.BackupName);
+                //MyBackup.MyBackups.Remove(backup);
+                MyBackup.DeleteBackup(backup);
+            }
+
+            CloseBackup.PerformClick();
+        }
+
         #endregion
+
 
         #region NotifyIcon
         private void ExitNotifyIcon_Click(object sender, EventArgs e)
@@ -266,6 +321,7 @@ namespace SQLAutoBackup
         }
         #endregion
 
+
         #region MyTreeView
 
         private void MyTreeView_AfterSelect(object sender, TreeViewEventArgs e)
@@ -281,7 +337,7 @@ namespace SQLAutoBackup
 
         private void MyParentPanel_VisibleChanged(object sender, EventArgs e)
         {
-            CloseBackup.Visible = SaveBackup.Visible = MyParentPanel.Visible;
+            DeleteBackup.Visible = CloseBackup.Visible = SaveBackup.Visible = MyParentPanel.Visible;
         }
 
         #region Connection
@@ -447,9 +503,9 @@ namespace SQLAutoBackup
             MyParentPanel.Visible = true;
         }
 
-        public void RefreshMyTreeView()
+        public void RefreshMyTreeView(MyBackup backup)
         {
-            foreach (var backup in MyBackup.MyBackups.OrderBy(x => x.MyIndex))
+            //foreach (var backup in MyBackup.MyBackups.OrderBy(x => x.MyIndex))
             {
                 TreeNode node;
                 if (MyTreeView.Nodes.ContainsKey(backup.MyIndex.ToString()))
@@ -461,10 +517,15 @@ namespace SQLAutoBackup
                         Tag = backup,
                         Name = backup.MyIndex.ToString(),
                         ImageIndex = 0,
-                        
+
                     };
 
-                node.Text = backup.BackupName + Environment.NewLine + "";
+                var rem = ToReadableString(GetRemainingTime(backup, out long At));
+                var RebeatAt = new DateTime(At);
+
+                node.Text = backup.BackupName + Environment.NewLine +
+                    RebeatAt.ToString("dd MMM yy hh:mm tt") + Environment.NewLine +
+                    rem;
 
                 if (!MyTreeView.Nodes.Contains(node))
                     MyTreeView.Nodes.Add(node);
@@ -472,6 +533,7 @@ namespace SQLAutoBackup
         }
 
         #endregion
+
 
         private void MyTreeView_DrawNode(object sender, DrawTreeNodeEventArgs e)
         {
@@ -497,6 +559,125 @@ namespace SQLAutoBackup
             {
                 e.DrawDefault = true;
             }
+        }
+
+
+        private bool TimerInUse;
+        private void MyBackupTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (this.TimerInUse) return;
+            this.TimerInUse = true;
+
+            for (int i = 0; i < MyBackup.MyBackups.Count; i++)
+            {
+                var backup = MyBackup.MyBackups[i];
+                var Remaining = GetRemainingTime(backup, out long At);
+                if (Remaining.TotalSeconds <= 0)
+                {
+                    string FileName = backup.BackupName + 
+                        "_" +
+                        backup.Database + 
+                        "_" +
+                        DateTime.Now.ToString() + ".bak";
+
+                    Vars.GiveEveryoneAccessControl(backup.BackupPath);
+
+                    FileName = Vars.RemoveInvalidFileNameChars(FileName);
+                    var path = Path.Combine(backup.BackupPath, FileName);
+
+                    var ConnectionString = SQLFunctions.GetConnectionString(backup.Host, backup.Database, backup.Authentication, backup.Username, backup.Password);
+
+                    var backupResult = SQLFunctions.BackupNow(path, ConnectionString);
+                    var backupState = new BackupState()
+                    {
+                        backup = backup,
+                        BackupDateTime = DateTime.Now.Ticks,
+                        DefaultBackupDateTime = At,
+                        FullPath = path,
+                        Warning = backupResult != null,
+                    };
+
+                    if (backupResult != null)
+                    {
+                        backupState.WarningMessage = backupResult.Message;
+                        backupState.FullWarning = backupResult.ToString();
+                    }
+                    MyBackup.SaveBackupState(backupState);
+                    backup.LastBackup = DateTime.Now.Ticks;
+                    MyBackup.SaveBackup(backup);
+                }
+
+                if (this.MyTreeView.InvokeRequired)
+                {
+                    this.MyTreeView.BeginInvoke((MethodInvoker)delegate ()
+                    {
+                        this.RefreshMyTreeView(backup);
+                    });
+                }
+                else
+                {
+                    this.RefreshMyTreeView(backup);
+                }
+            }
+
+            this.TimerInUse = false;
+        }
+
+
+        public static TimeSpan GetRemainingTime(MyBackup backup, out long RebeatAt)
+        {
+            if (backup == null)
+            {
+                RebeatAt = 0;
+                return new TimeSpan();
+            }
+
+            var LastBackup = new DateTime(backup.LastBackup);
+            if (backup.Repeat)
+            {
+                int Days = 0;
+                var RepeatTime = backup.RepeatTime;
+                if (!backup.RepeatDay(LastBackup.DayOfWeek) || (backup.RepeatDay(LastBackup.DayOfWeek) && RepeatTime <= LastBackup.TimeOfDay))//Created today
+                {
+                    for (int i = 0; i < 7; i++)
+                    {
+                        var backdate = LastBackup.AddDays(i + 1);
+                        if (backup.RepeatDay(backdate.DayOfWeek))
+                        {
+                            Days = i + 1;
+                            break;
+                        }
+                    }
+                }
+                var RepeatAfter = new DateTime(RepeatTime.Ticks).AddDays(Days);//TimeSpan(Days, RepeatTime.Hours, );//NextBackup
+                RebeatAt = RepeatAfter.Ticks + LastBackup.Ticks;
+            }
+            else //backup.Specific
+            {
+                RebeatAt = backup.SpecificAfter.Ticks + LastBackup.Ticks;
+            }
+
+            return TimeSpan.FromTicks(RebeatAt - DateTime.Now.Ticks);
+        }
+
+        /// <summary>
+        /// https://stackoverflow.com/a/4423615/1726761
+        /// </summary>
+        /// <param name="span"></param>
+        /// <returns></returns>
+        public static string ToReadableString(TimeSpan span)
+        {
+            string formatted = string.Format("{0}{1}{2}{3}",
+                span.Duration().Days > 0 ? string.Format("{0:0} day{1}, ", span.Days, span.Days == 1 ? string.Empty : "s") : string.Empty,
+                span.Duration().Hours > 0 ? string.Format("{0:0} hour{1}, ", span.Hours, span.Hours == 1 ? string.Empty : "s") : string.Empty,
+                span.Duration().Minutes > 0 ? string.Format("{0:0} minute{1}, ", span.Minutes, span.Minutes == 1 ? string.Empty : "s") : string.Empty,
+                span.Duration().Seconds > 0 ? string.Format("{0:0} second{1}", span.Seconds, span.Seconds == 1 ? string.Empty : "s") : string.Empty);
+
+            if (formatted.EndsWith(", ")) formatted = formatted.Substring(0, formatted.Length - 2);
+
+            if (string.IsNullOrEmpty(formatted)) formatted = "0 seconds";
+
+            return formatted;
         }
     }
 }

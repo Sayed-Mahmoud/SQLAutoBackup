@@ -103,9 +103,19 @@ namespace SQLAutoBackup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Close_48 {
+        internal static System.Drawing.Bitmap CloseIcon_48 {
             get {
-                object obj = ResourceManager.GetObject("Close_48", resourceCulture);
+                object obj = ResourceManager.GetObject("CloseIcon_48", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap CloseIcon_481 {
+            get {
+                object obj = ResourceManager.GetObject("CloseIcon_481", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -153,9 +163,29 @@ namespace SQLAutoBackup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap SQLDelete_48 {
+            get {
+                object obj = ResourceManager.GetObject("SQLDelete_48", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap SQLSave_48 {
             get {
                 object obj = ResourceManager.GetObject("SQLSave_48", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SQLSave_48_2 {
+            get {
+                object obj = ResourceManager.GetObject("SQLSave_48_2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

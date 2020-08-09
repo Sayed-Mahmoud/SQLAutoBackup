@@ -77,7 +77,7 @@ namespace SQLAutoBackup
 
         static void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            MyBackup.Load(mainMenu);
+            MyBackup.LoadBackups(mainMenu);
         }
 
         static void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

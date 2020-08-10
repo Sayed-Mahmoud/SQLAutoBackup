@@ -24,8 +24,15 @@ namespace SQLAutoBackup
         /// <returns>bool</returns>
         public static bool TestConnection(bool ShowTest, string DS, string DB, bool IS, string User, string Pass, out string ConnectionString, out string ExcMessage)
         {
-            if (DB.Length == 0)
-                DB = "master";
+            if (DB.Length == 0 || DS.Length == 0)
+            {
+                //DB = "master";
+                ConnectionString = "";
+                ExcMessage = "Please select your host and database!";
+                if (ShowTest)
+                    MessageBox.Show("Please select your host and database!", "Connection Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
 
             bool ISecurity = IS || (User.Length == 0 || Pass.Length == 0);//If user or password is empty return true (Windows Auth)
             var builder = new SqlConnectionStringBuilder()

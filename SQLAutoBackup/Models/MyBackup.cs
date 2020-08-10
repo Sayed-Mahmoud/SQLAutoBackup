@@ -109,9 +109,16 @@ namespace SQLAutoBackup.Models
             {
                 DeleteBackupState(backup.BackupStatus[0]);
             }
+
             IniFile MyIni = new IniFile("Configuration.ini");
             MyIni.DeleteSection("Configuration#" + backup.MyIndex);
             MyBackups.Remove(backup);
+            int MaxIndex;
+            if (MyBackups.Count == 0)
+                MaxIndex = 0;
+            else
+                MaxIndex = MyBackups.Max(x => x.MyIndex);
+            MyIni.Write("Configuration", "MaxIndex", MaxIndex.ToString());
         }
 
         #endregion

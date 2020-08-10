@@ -139,7 +139,7 @@ namespace SQLAutoBackup
 
         private void SaveBackup_Click(object sender, EventArgs e)
         {
-            string BackupName = BackupNameTxt.Text.Trim();
+            var BackupName = BackupNameTxt.Text.Trim();
 
             #region Save Validation
             int index = ((MyBackup)MyParentPanel.Tag).MyIndex;
@@ -225,15 +225,15 @@ namespace SQLAutoBackup
             backup.Specific = SpecificRadio.Checked;
             backup.Every = SpecificNum.Value;
             if (MinutesRadio.Checked)
-                backup.SpecificType = MyBackup.SpecificTypes.Minutes;
+                backup.SpecificType = SpecificTypes.Minutes;
             else if (HoursRadio.Checked)
-                backup.SpecificType = MyBackup.SpecificTypes.Hours;
+                backup.SpecificType = SpecificTypes.Hours;
             else if (DaysRadio.Checked)
-                backup.SpecificType = MyBackup.SpecificTypes.Days;
+                backup.SpecificType = SpecificTypes.Days;
             else if (WeeksRadio.Checked)
-                backup.SpecificType = MyBackup.SpecificTypes.Weeks;
+                backup.SpecificType = SpecificTypes.Weeks;
             else if (MonthsRadio.Checked)
-                backup.SpecificType = MyBackup.SpecificTypes.Months;
+                backup.SpecificType = SpecificTypes.Months;
             //Years
 
             if (index == 0 || backup.LastBackup < 1)
@@ -260,7 +260,7 @@ namespace SQLAutoBackup
                 if (MessageBox.Show("Are you sure? You want to delete the backup permanently?", "Delete Backup", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                     return;
 
-                MyTreeView.Nodes.RemoveByKey(backup.BackupName);
+                MyTreeView.Nodes.RemoveByKey(backup.MyIndex.ToString());
                 //MyBackup.MyBackups.Remove(backup);
                 MyBackup.DeleteBackup(backup);
             }
@@ -449,11 +449,21 @@ namespace SQLAutoBackup
                 //SQL Connection
                 if (backup.Host.Length > 0 && !HostCoBox.Items.Contains(backup.Host))
                     HostCoBox.Items.Add(backup.Host);
-                HostCoBox.SelectedItem = backup.Host;
+
+                if (backup.Host.Length > 0)
+                    HostCoBox.SelectedItem = backup.Host;
+                else 
+                    HostCoBox.SelectedIndex = -1;
+
 
                 if (backup.Database.Length > 0 && !DBCoBox.Items.Contains(backup.Database))
                     DBCoBox.Items.Add(backup.Database);
-                DBCoBox.SelectedItem = backup.Database;
+
+                if (backup.Database.Length > 0)
+                    DBCoBox.SelectedItem = backup.Database;
+                else
+                    DBCoBox.SelectedIndex = -1;
+
 
                 if (backup.Authentication)
                     AuthCoBox.SelectedIndex = 1;

@@ -46,7 +46,7 @@ namespace SQLAutoBackup.Models
         public static void CreateStartup()
         {
             string ToPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\" + Path.GetFileNameWithoutExtension(Application.ExecutablePath) + ".url";
-            if (!System.IO.File.Exists(ToPath))
+            //if (!System.IO.File.Exists(ToPath))
             {
                 object shStartup = (object)"Startup";
                 WshShell shell = new WshShell();

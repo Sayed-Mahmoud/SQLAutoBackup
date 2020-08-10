@@ -30,18 +30,12 @@ namespace SQLAutoBackup
 
         private void SQLAutoBackup_Load(object sender, EventArgs e)
         {
-            //AuthCoBox.SelectedIndex = 0;
-
             if (this.AutoStartup)
             {
                 ShowHideNotifyIcon_Click(sender, e);
             }
-
             HostWorker.DoWork += new DoWorkEventHandler(Worker_DoWork);
             HostWorker.RunWorkerAsync();
-
-            //MyTreeView.Nodes.Clear();
-            //RefreshMyTreeView();
         }
 
         public void BackupsLoaded()
@@ -289,11 +283,13 @@ namespace SQLAutoBackup
             {
                 Visible = true;
                 WindowState = FormWindowState.Normal;
+                this.ShowInTaskbar = true;
                 Activate();
             }
             else
             {
-                WindowState = FormWindowState.Minimized;
+                WindowState = FormWindowState.Minimized; 
+                this.ShowInTaskbar = false;
             }
         }
 
@@ -304,12 +300,7 @@ namespace SQLAutoBackup
             if (mea.Button != MouseButtons.Left)
                 return;
 
-            if (WindowState == FormWindowState.Minimized)
-            {
-                Visible = true;
-                WindowState = FormWindowState.Normal;
-            }
-            Activate();
+            ShowHideNotifyIcon.PerformClick();
         }
 
         private void MyNotifyIconContext_Opening(object sender, CancelEventArgs e)

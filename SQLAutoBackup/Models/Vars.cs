@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using IWshRuntimeLibrary;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace SQLAutoBackup.Models
 {
@@ -41,7 +43,34 @@ namespace SQLAutoBackup.Models
             Directory.SetAccessControl(path, sec);
         }
 
-
+        public static void CreateStartup()
+        {
+            string ToPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\" + Path.GetFileNameWithoutExtension(Application.ExecutablePath) + ".url";
+            if (!System.IO.File.Exists(ToPath))
+            {
+                object shStartup = (object)"Startup";
+                WshShell shell = new WshShell();
+                string shortcutAddress = (string)shell.SpecialFolders.Item(ref shStartup) + @"\" + Path.GetFileNameWithoutExtension(Application.ExecutablePath) + ".lnk";
+                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
+                //shortcut.IconLocation = Application.ExecutablePath;
+                shortcut.Description = "SQL AutoBackup startup";
+                shortcut.TargetPath = Application.ExecutablePath;
+                shortcut.Arguments = "/onboot";
+                shortcut.Save();
+            }
+            #region Old Startup
+            /*
+            using (RegistryKey regkey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+            {
+                if (regkey != null && regkey.GetValue("MyApp") == null)
+                {
+                    string strPath = Application.ExecutablePath + " /onboot";
+                    regkey.SetValue(Path.GetFileNameWithoutExtension(Application.ExecutablePath), strPath, RegistryValueKind.String);
+                }
+            }
+            */
+            #endregion
+        }
     }
 
     [SuppressUnmanagedCodeSecurityAttribute]

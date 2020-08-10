@@ -12,8 +12,6 @@ namespace SQLAutoBackup
 {
     static class Program
     {
-        public static bool DebugMode = false;
-        //public static bool IsLoaded;
         public static MainMenu mainMenu;
 
         /// <summary>
@@ -39,19 +37,7 @@ namespace SQLAutoBackup
             }
             #endregion
 
-            #region Startup
-            if (!DebugMode)
-            {
-                using (RegistryKey regkey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
-                {
-                    if (regkey != null && regkey.GetValue("MyApp") == null)
-                    {
-                            string strPath = Application.ExecutablePath + " /onboot";
-                        regkey.SetValue(Path.GetFileNameWithoutExtension(Application.ExecutablePath), strPath, RegistryValueKind.String);
-                    }
-                }
-            }
-            #endregion
+            Vars.CreateStartup();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -76,12 +62,8 @@ namespace SQLAutoBackup
 
         static void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //IsLoaded = true;
             if (e.Error != null)
-                if (DebugMode)
-                    MessageBox.Show(e.Error.ToString());
-                else
-                    MessageBox.Show(e.Error.Message);
+                MessageBox.Show(e.Error.ToString());
         }
     }
 }

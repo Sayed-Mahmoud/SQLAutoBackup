@@ -12,8 +12,8 @@ namespace SQLAutoBackup
 {
     static class Program
     {
-        public static bool DebugMode = true;
-        //Bpublic static bool IsLoaded;
+        public static bool DebugMode = false;
+        //public static bool IsLoaded;
         public static MainMenu mainMenu;
 
         /// <summary>
@@ -44,16 +44,10 @@ namespace SQLAutoBackup
             {
                 using (RegistryKey regkey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
                 {
-                    if (regkey != null)
+                    if (regkey != null && regkey.GetValue("MyApp") == null)
                     {
-                        string strPath = Application.ExecutablePath + " /onboot";
+                            string strPath = Application.ExecutablePath + " /onboot";
                         regkey.SetValue(Path.GetFileNameWithoutExtension(Application.ExecutablePath), strPath, RegistryValueKind.String);
-                        /*
-                        if (string.IsNullOrEmpty((string)regkey.GetValue(Path.GetFileNameWithoutExtension(Application.ExecutablePath))))
-                        {
-
-                        }
-                        */
                     }
                 }
             }

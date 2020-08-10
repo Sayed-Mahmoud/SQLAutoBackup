@@ -571,40 +571,44 @@ namespace SQLAutoBackup
             for (int i = 0; i < MyBackup.MyBackups.Count; i++)
             {
                 var backup = MyBackup.MyBackups[i];
-                var Remaining = GetRemainingTime(backup, out long At);
-                if (Remaining.TotalSeconds <= 0)
+
+                if (backup.IsEnabled)
                 {
-                    string FileName = backup.BackupName + 
-                        "_" +
-                        backup.Database + 
-                        "_" +
-                        DateTime.Now.ToString() + ".bak";
-
-                    Vars.GiveEveryoneAccessControl(backup.BackupPath);
-
-                    FileName = Vars.RemoveInvalidFileNameChars(FileName);
-                    var path = Path.Combine(backup.BackupPath, FileName);
-
-                    var ConnectionString = SQLFunctions.GetConnectionString(backup.Host, backup.Database, backup.Authentication, backup.Username, backup.Password);
-
-                    var backupResult = SQLFunctions.BackupNow(path, ConnectionString);
-                    var backupState = new BackupState()
+                    var Remaining = GetRemainingTime(backup, out long At);
+                    if (Remaining.TotalSeconds <= 0)
                     {
-                        backup = backup,
-                        BackupDateTime = DateTime.Now.Ticks,
-                        DefaultBackupDateTime = At,
-                        FullPath = path,
-                        Warning = backupResult != null,
-                    };
+                        string FileName = backup.BackupName +
+                            "_" +
+                            backup.Database +
+                            "_" +
+                            DateTime.Now.ToString() + ".bak";
 
-                    if (backupResult != null)
-                    {
-                        backupState.WarningMessage = backupResult.Message;
-                        backupState.FullWarning = backupResult.ToString();
+                        Vars.GiveEveryoneAccessControl(backup.BackupPath);
+
+                        FileName = Vars.RemoveInvalidFileNameChars(FileName);
+                        var path = Path.Combine(backup.BackupPath, FileName);
+
+                        var ConnectionString = SQLFunctions.GetConnectionString(backup.Host, backup.Database, backup.Authentication, backup.Username, backup.Password);
+
+                        var backupResult = SQLFunctions.BackupNow(path, ConnectionString);
+                        var backupState = new BackupState()
+                        {
+                            backup = backup,
+                            BackupDateTime = DateTime.Now.Ticks,
+                            DefaultBackupDateTime = At,
+                            FullPath = path,
+                            Warning = backupResult != null,
+                        };
+
+                        if (backupResult != null)
+                        {
+                            backupState.WarningMessage = backupResult.Message;
+                            backupState.FullWarning = backupResult.ToString();
+                        }
+                        MyBackup.SaveBackupState(backupState);
+                        backup.LastBackup = DateTime.Now.Ticks;
+                        MyBackup.SaveBackup(backup);
                     }
-                    MyBackup.SaveBackupState(backupState);
-                    backup.LastBackup = DateTime.Now.Ticks;
-                    MyBackup.SaveBackup(backup);
                 }
 
                 if (this.MyTreeView.InvokeRequired)

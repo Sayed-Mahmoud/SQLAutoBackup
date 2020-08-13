@@ -200,8 +200,18 @@ namespace SQLAutoBackup
             backup.BackupName = BackupName;
 
             //SQL Connection
-            backup.Host = HostCoBox.SelectedItem.ToString();
-            backup.Database = DBCoBox.SelectedItem.ToString();
+            string host;
+            if (HostCoBox.SelectedItem != null)
+                host = HostCoBox.SelectedItem.ToString();
+            else
+                host = HostCoBox.SelectedText;
+
+            string db;
+            if (DBCoBox.SelectedItem != null)
+                db = DBCoBox.SelectedItem.ToString();
+            else
+                db = DBCoBox.SelectedText;
+
             backup.Authentication = AuthCoBox.SelectedIndex == 1;
             backup.Username = UsernameTxt.Text;
             backup.Password = PassTxt.Text;

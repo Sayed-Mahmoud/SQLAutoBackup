@@ -97,6 +97,8 @@
             this.CloseBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.DeleteBackup = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.BackupStatusBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.MyMenuStrip.SuspendLayout();
             this.MyNotifyIconContext.SuspendLayout();
             this.MyParentPanel.SuspendLayout();
@@ -813,7 +815,9 @@
             this.SaveBackup,
             this.CloseBackup,
             this.toolStripSeparator4,
-            this.DeleteBackup});
+            this.DeleteBackup,
+            this.toolStripSeparator5,
+            this.BackupStatusBtn});
             this.MyToolStrip.Location = new System.Drawing.Point(0, 24);
             this.MyToolStrip.Name = "MyToolStrip";
             this.MyToolStrip.Size = new System.Drawing.Size(784, 70);
@@ -895,6 +899,7 @@
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
             this.toolStripSeparator4.Size = new System.Drawing.Size(6, 70);
+            this.toolStripSeparator4.Visible = false;
             // 
             // DeleteBackup
             // 
@@ -910,6 +915,27 @@
             this.DeleteBackup.Visible = false;
             this.DeleteBackup.Click += new System.EventHandler(this.DeleteBackup_Click);
             this.DeleteBackup.VisibleChanged += new System.EventHandler(this.DeleteBackup_VisibleChanged);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 70);
+            this.toolStripSeparator5.Visible = false;
+            // 
+            // BackupStatusBtn
+            // 
+            this.BackupStatusBtn.AutoSize = false;
+            this.BackupStatusBtn.Image = global::SQLAutoBackup.Properties.Resources.SQLStatus2_48;
+            this.BackupStatusBtn.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.BackupStatusBtn.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.BackupStatusBtn.Name = "BackupStatusBtn";
+            this.BackupStatusBtn.Size = new System.Drawing.Size(80, 67);
+            this.BackupStatusBtn.Text = "Status...";
+            this.BackupStatusBtn.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.BackupStatusBtn.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.BackupStatusBtn.Visible = false;
+            this.BackupStatusBtn.Click += new System.EventHandler(this.BackupStatusBtn_Click);
+            this.BackupStatusBtn.VisibleChanged += new System.EventHandler(this.BackupStatusBtn_VisibleChanged);
             // 
             // MainMenu
             // 
@@ -1019,6 +1045,8 @@
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem DeleteBackup;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem BackupStatusBtn;
     }
 }
 

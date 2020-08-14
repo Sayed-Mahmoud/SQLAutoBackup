@@ -121,6 +121,11 @@ namespace SQLAutoBackup
             toolStripSeparator4.Visible = DeleteBackup.Visible;
         }
 
+        private void BackupStatusBtn_VisibleChanged(object sender, EventArgs e)
+        {
+            toolStripSeparator5.Visible = BackupStatusBtn.Visible;
+        }
+
         private void NewBackup_Click(object sender, EventArgs e)
         {
             ShowBackup(null);
@@ -205,12 +210,14 @@ namespace SQLAutoBackup
                 host = HostCoBox.SelectedItem.ToString();
             else
                 host = HostCoBox.SelectedText;
+            backup.Host = host;
 
             string db;
             if (DBCoBox.SelectedItem != null)
                 db = DBCoBox.SelectedItem.ToString();
             else
                 db = DBCoBox.SelectedText;
+            backup.Database = db;
 
             backup.Authentication = AuthCoBox.SelectedIndex == 1;
             backup.Username = UsernameTxt.Text;
@@ -222,7 +229,7 @@ namespace SQLAutoBackup
 
             //Backup Repeat Datetime
             backup.Repeat = RepeatRadio.Checked;
-            backup.Time = TimePicker.Value.Ticks;
+            backup.Time = new TimeSpan(TimePicker.Value.Hour, TimePicker.Value.Minute, 0).Ticks;//new TimeSpan(TimePicker.Value.Hour == 0 ? 1 : 0, TimePicker.Value.Hour, TimePicker.Value.Minute, 0).Ticks;
             backup.Sat = SatBox.Checked;
             backup.Sun = SunBox.Checked;
             backup.Mon = MonBox.Checked;
@@ -256,10 +263,9 @@ namespace SQLAutoBackup
 
         private void CloseBackup_Click(object sender, EventArgs e)
         {
-            MyParentPanel.Visible = false;
+            MyParentPanel.Visible = CloneBackup.Visible = BackupStatusBtn.Visible = false;
             MyParentPanel.Tag = null;
             MyTreeView.SelectedNode = null;
-            CloneBackup.Visible = false;
         }
 
         private void DeleteBackup_Click(object sender, EventArgs e)
@@ -276,6 +282,14 @@ namespace SQLAutoBackup
             }
 
             CloseBackup.PerformClick();
+        }
+
+        private void BackupStatusBtn_Click(object sender, EventArgs e)
+        {
+            using (var backupStatus = new BackupStatus((MyBackup)MyParentPanel.Tag))
+            {
+                backupStatus.ShowDialog(this);
+            }
         }
 
         #endregion
@@ -298,7 +312,7 @@ namespace SQLAutoBackup
             }
             else
             {
-                WindowState = FormWindowState.Minimized; 
+                WindowState = FormWindowState.Minimized;
                 this.ShowInTaskbar = false;
             }
         }
@@ -441,12 +455,12 @@ namespace SQLAutoBackup
             if (backup == null)
             {
                 MyTreeView.SelectedNode = null;
-                CloneBackup.Visible = false;
+                CloneBackup.Visible = BackupStatusBtn.Visible = false;
                 backup = new MyBackup();
             }
             else
             {
-                CloneBackup.Visible = true;
+                CloneBackup.Visible = BackupStatusBtn.Visible = true;
             }
 
             if (!Clone)
@@ -462,7 +476,7 @@ namespace SQLAutoBackup
 
                 if (backup.Host.Length > 0)
                     HostCoBox.SelectedItem = backup.Host;
-                else 
+                else
                     HostCoBox.SelectedIndex = -1;
 
 
@@ -490,7 +504,8 @@ namespace SQLAutoBackup
 
                 //Backup Repeat Datetime
                 RepeatRadio.Checked = backup.Repeat;
-                TimePicker.Value = new DateTime(backup.Time);
+                var time = new DateTime(backup.Time);
+                TimePicker.Value = new DateTime(1753, 1, 1, time.Hour, time.Minute, 0);
                 SatBox.Checked = backup.Sat;
                 SunBox.Checked = backup.Sun;
                 MonBox.Checked = backup.Mon;
@@ -652,20 +667,21 @@ namespace SQLAutoBackup
             {
                 int Days = 0;
                 var RepeatTime = backup.RepeatTime;
-                if (!backup.RepeatDay(LastBackup.DayOfWeek) || (backup.RepeatDay(LastBackup.DayOfWeek) && RepeatTime <= LastBackup.TimeOfDay))//Created today
+                //if (!backup.RepeatDay(DateTime.Now.DayOfWeek) || (backup.RepeatDay(DateTime.Now.DayOfWeek) && new TimeSpan(LastBackup.Hour, LastBackup.Minute, 0) > RepeatTime))
+                if (!backup.RepeatDay(LastBackup.DayOfWeek) || (backup.RepeatDay(LastBackup.DayOfWeek) && LastBackup >= DateTime.Today.Add(RepeatTime)))
                 {
-                    for (int i = 0; i < 7; i++)
+                    for (int i = 1; i < 7; i++)
                     {
-                        var backdate = LastBackup.AddDays(i + 1);
+                        var backdate = LastBackup.AddDays(i);
                         if (backup.RepeatDay(backdate.DayOfWeek))
                         {
-                            Days = i + 1;
+                            Days = i;
                             break;
                         }
                     }
                 }
-                var RepeatAfter = new DateTime(RepeatTime.Ticks).AddDays(Days);//TimeSpan(Days, RepeatTime.Hours, );//NextBackup
-                RebeatAt = RepeatAfter.Ticks + LastBackup.Ticks;
+                var RepeatAfter = DateTime.Now.Date.Add(RepeatTime).AddDays(Days);//TimeSpan(Days, RepeatTime.Hours, );//NextBackup
+                RebeatAt = RepeatAfter.Ticks;//RepeatAfter.Ticks + LastBackup.Ticks;
             }
             else //backup.Specific
             {

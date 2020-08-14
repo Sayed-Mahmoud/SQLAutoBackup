@@ -297,7 +297,10 @@ namespace SQLAutoBackup.Models
             get
             {
                 var time = new DateTime(Time);
+                if (time.Hour == 0)
+                    time.AddDays(1);
                 return new TimeSpan(time.Hour, time.Minute, 0);
+                //return new TimeSpan(Time);
             }
         }
 

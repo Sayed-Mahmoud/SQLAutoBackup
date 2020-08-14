@@ -56,6 +56,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackupStatus.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BackupStatus.Designer.cs">
+      <DependentUpon>BackupStatus.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainMenu.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -68,6 +74,9 @@
     <Compile Include="Models\Vars.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="BackupStatus.resx">
+      <DependentUpon>BackupStatus.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -106,6 +115,7 @@
     <None Include="Resources\SQLDelete_48.png" />
     <None Include="Resources\CloseIcon_48.png" />
     <None Include="Resources\CloseIcon_481.png" />
+    <None Include="Resources\SQLStatus2_48.png" />
     <Content Include="SqlBackup.ico" />
   </ItemGroup>
   <ItemGroup>
